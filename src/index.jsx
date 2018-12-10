@@ -7,9 +7,6 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 import 'brace/mode/javascript'
 import 'brace/theme/tomorrow_night'
-import injectTestFuncs from './tester/injectTestFuncs'
-
-injectTestFuncs()
 
 const Index = () => (
   <Router>

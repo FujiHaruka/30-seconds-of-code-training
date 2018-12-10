@@ -25,7 +25,6 @@ const Editor = ({
     showGutter
     highlightActiveLine
     setOptions={{
-      enableBasicAutocompletion: true,
       showLineNumbers: true,
       tabSize: 2,
       useSoftTabs: true,
