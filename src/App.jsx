@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
 import './App.css'
 import Layout from './Layout'
-import Sidebar from './Sidebar'
+import Menu from './Menu'
 import Playground from './Playground'
+import fetchSnippets from './fetch/fetchSnippets'
 
 class App extends Component {
   render () {
     return (
       <Layout
-        side={Sidebar}
+        side={Menu}
         main={Playground}
         state={this.state}
       />
@@ -23,9 +24,7 @@ class App extends Component {
   }
 
   async componentDidMount () {
-    const resp = await window.fetch('/snippets.json')
-    let snippets = await resp.json()
-    snippets = snippets.data.filter(({ type, meta }) => type === 'snippet' && !meta.archived)
+    const snippets = await fetchSnippets()
     this.setState({ snippets })
   }
 }

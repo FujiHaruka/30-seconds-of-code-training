@@ -3,3 +3,8 @@
   box-sizing: border-box;
   padding: 16px;
 }
+
+.Playground-code {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}

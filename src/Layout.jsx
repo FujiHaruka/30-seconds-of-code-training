@@ -1,20 +1,26 @@
 import React from 'react'
-import { Sidebar, Menu } from 'semantic-ui-react'
+import { Grid, Menu } from 'semantic-ui-react'
+import './Layout.css'
 
 const Layout = ({ side: Side, main: Main, state }) => (
-  <Sidebar.Pushable>
-    <Sidebar
-    as={Menu}
-    visible
-    inverted
-    vertical
+  <Grid className='Layout'>
+    <Grid.Column
+      className='Layout-side'
+      as={Menu}
+      inverted
+      vertical
+      width={4}
     >
       <Side {...state} />
-    </Sidebar>
-    <Sidebar.Pusher>
+    </Grid.Column>
+    <Grid.Column
+      stretched
+      width={12}
+      className='Layout-main'
+    >
       <Main {...state} />
-    </Sidebar.Pusher>
-  </Sidebar.Pushable>
+    </Grid.Column>
+  </Grid>
 )
 
 export default Layout

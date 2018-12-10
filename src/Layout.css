@@ -1,0 +1,8 @@
+.Layout {
+  height: 100%;
+}
+
+.Layout-side {
+  height: 100%;
+  overflow-y: scroll;
+}
