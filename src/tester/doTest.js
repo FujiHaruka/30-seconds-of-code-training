@@ -7,10 +7,8 @@ export default async function doTest (code) {
     // eslint-disable-next-line no-eval
     results = await eval(code)
   } catch (error) {
-    return {
-      code: 'SYNTAX_ERROR',
-      error,
-    }
+    // Syntax error はコンパイルで補足されるはずなのでここに来ることはない
+    console.error(`[NEVER HERE]`, error)
   } finally {
     resetTestGlobals()
   }

@@ -2,7 +2,7 @@ import React from 'react'
 import { Header, Button, Dimmer, Loader } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import './Playground.css'
-import createTest from './tester/createTest'
+import compileTest from './tester/compileTest'
 import fetchTest from './fetch/fetchTest'
 import doTest from './tester/doTest'
 import Editor from './Editor'
@@ -117,7 +117,14 @@ class Playground extends React.Component {
 
   submit = async () => {
     const { editorText: code, testCode } = this.state
-    const test = createTest(code, testCode)
+    let test
+    try {
+      test = compileTest(code, testCode)
+    } catch (err) {
+      // Syntax error はここで補足される
+      console.error(err)
+      return
+    }
     this.setState({ busy: true })
     try {
       const result = await doTest(test)
