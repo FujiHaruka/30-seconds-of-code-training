@@ -1,8 +1,7 @@
 import React from 'react'
-import { Header, Button } from 'semantic-ui-react'
+import { Header, Button, Dimmer, Loader } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import './Playground.css'
-import AceEditor from 'react-ace'
 import createTest from './tester/createTest'
 import fetchTest from './fetch/fetchTest'
 import doTest from './tester/doTest'
@@ -11,6 +10,7 @@ import Editor from './Editor'
 class Playground extends React.Component {
   render () {
     const {
+      busy,
       snippet,
       editorText,
       testCode,
@@ -20,6 +20,10 @@ class Playground extends React.Component {
     }
     return (
       <div className='Playground'>
+        <Dimmer active={busy} inverted>
+          <Loader />
+        </Dimmer>
+
         <Header as='h1'>{snippet.id}</Header>
         <p>
           {snippet.attributes.text.split('\n')[0]}
@@ -57,8 +61,9 @@ class Playground extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      busy: false,
       snippet: null,
-      editorText: 'const ary = (fn, n) => (...args) => fn(...args.slice(0, n))',
+      editorText: '',
       testCode: '',
     }
   }
@@ -79,7 +84,15 @@ class Playground extends React.Component {
     const { match, snippets } = this.props
     const snippet = snippets.find(({ id }) => match.params.id === id)
     if (snippet) {
-      this.setState({ snippet })
+      // TODO: 引数を自動設定
+      const initialCode =
+`function ${snippet.id} () {
+  /* Complete function! */
+}`
+      this.setState({
+        snippet,
+        editorText: initialCode,
+      })
     }
   }
 
@@ -87,7 +100,6 @@ class Playground extends React.Component {
     await setImmediate(() => Promise.resolve())
     const { snippet } = this.state
     if (!snippet) {
-      console.log('no snippet')
       return
     }
     const testCode = await fetchTest(snippet.id)
@@ -106,8 +118,13 @@ class Playground extends React.Component {
   submit = async () => {
     const { editorText: code, testCode } = this.state
     const test = createTest(code, testCode)
-    const result = await doTest(test)
-    console.log(result)
+    this.setState({ busy: true })
+    try {
+      const result = await doTest(test)
+      console.log(result)
+    } finally {
+      this.setState({ busy: false })
+    }
   }
 }
 
