@@ -16,3 +16,11 @@
 .Playground-code-hidden {
   height: 3px !important;
 }
+
+.Playground-result {
+  padding: 12px;
+  background: #fffccb;
+  color: #444;
+  font-weight: 600;
+  border: 1px solid #666;
+}

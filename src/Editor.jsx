@@ -7,6 +7,9 @@ const Editor = ({
   onChange,
   value,
   readOnly,
+  showGutter = true,
+  mode = 'javascript',
+  theme = 'tomorrow_night',
 }) => (
   <AceEditor
     {...{
@@ -15,15 +18,15 @@ const Editor = ({
       onChange,
       value,
       readOnly,
+      showGutter,
+      mode,
+      theme,
     }}
-    mode='javascript'
-    theme='tomorrow_night'
     width='100%'
     minLines={1}
     maxLines={100}
     fontSize={14}
-    showGutter
-    highlightActiveLine
+    highlightActiveLine={!readOnly}
     setOptions={{
       showLineNumbers: true,
       tabSize: 2,

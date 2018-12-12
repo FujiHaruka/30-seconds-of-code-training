@@ -7,15 +7,18 @@ import fetchTest from './fetch/fetchTest'
 import doTest from './tester/doTest'
 import Editor from './Editor'
 import c from 'classnames'
+import { formatTestResult } from './helpers'
 
 class Playground extends React.Component {
   render () {
     const {
+      ready,
       busy,
       snippet,
       editorText,
       testCode,
       visibleTestCode,
+      resultText,
     } = this.state
     if (!snippet) {
       return null
@@ -49,8 +52,9 @@ class Playground extends React.Component {
         />
         <Editor
           name='test'
-          className={c('Playground-code', 'Playground-code-test', {
+          className={c('Playground-code', {
             'Playground-code-hidden': !visibleTestCode,
+            'Playground-code-test': ready,
           })}
           value={testCode}
           readOnly
@@ -61,6 +65,11 @@ class Playground extends React.Component {
         >
           Submit
         </Button>
+
+        {
+          resultText &&
+          <pre className='Playground-result'><code dangerouslySetInnerHTML={{ __html: resultText }} /></pre>
+        }
       </div>
     )
   }
@@ -68,11 +77,13 @@ class Playground extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      ready: false,
       busy: false,
       snippet: null,
       editorText: '',
       testCode: '',
       visibleTestCode: false,
+      resultText: '',
     }
   }
 
@@ -82,6 +93,9 @@ class Playground extends React.Component {
       this.setState({
         testCode: '',
         snippet: null,
+        resultText: '',
+        ready: false,
+        visibleTestCode: false,
       })
       this.setSnippet()
       this.fetchTestCode()
@@ -111,7 +125,10 @@ class Playground extends React.Component {
       return
     }
     const testCode = await fetchTest(snippet.id)
-    this.setState({ testCode })
+    this.setState({
+      testCode,
+      ready: true,
+    })
   }
 
   isReady () {
@@ -140,8 +157,8 @@ class Playground extends React.Component {
     }
     this.setState({ busy: true })
     try {
-      const result = await doTest(test)
-      console.log(result)
+      const results = await doTest(test)
+      this.setState({ resultText: formatTestResult(results) })
     } finally {
       this.setState({ busy: false })
     }
