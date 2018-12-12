@@ -8,3 +8,11 @@
   margin-top: 16px;
   margin-bottom: 16px;
 }
+
+.Playground-code-test {
+  transition: height 0.3s ease;
+}
+
+.Playground-code-hidden {
+  height: 3px !important;
+}

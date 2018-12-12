@@ -1,11 +1,12 @@
 import React from 'react'
-import { Header, Button, Dimmer, Loader } from 'semantic-ui-react'
+import { Header, Button, Dimmer, Loader, Menu, Grid, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import './Playground.css'
 import compileTest from './tester/compileTest'
 import fetchTest from './fetch/fetchTest'
 import doTest from './tester/doTest'
 import Editor from './Editor'
+import c from 'classnames'
 
 class Playground extends React.Component {
   render () {
@@ -14,6 +15,7 @@ class Playground extends React.Component {
       snippet,
       editorText,
       testCode,
+      visibleTestCode,
     } = this.state
     if (!snippet) {
       return null
@@ -41,10 +43,15 @@ class Playground extends React.Component {
           value={snippet.attributes.codeBlocks.example}
           readOnly
         />
-        <Header as='h2'>Test code</Header>
+        <Playground.TestCodeHeader
+          onToggleVisible={this.toggleVisibleTestCode}
+          active={visibleTestCode}
+        />
         <Editor
           name='test'
-          className='Playground-code'
+          className={c('Playground-code', 'Playground-code-test', {
+            'Playground-code-hidden': !visibleTestCode,
+          })}
           value={testCode}
           readOnly
         />
@@ -65,6 +72,7 @@ class Playground extends React.Component {
       snippet: null,
       editorText: '',
       testCode: '',
+      visibleTestCode: false,
     }
   }
 
@@ -115,6 +123,11 @@ class Playground extends React.Component {
 
   onChangeEditor = (editorText) => this.setState({ editorText })
 
+  toggleVisibleTestCode = () => {
+    const { visibleTestCode } = this.state
+    this.setState({ visibleTestCode: !visibleTestCode })
+  }
+
   submit = async () => {
     const { editorText: code, testCode } = this.state
     let test
@@ -133,6 +146,27 @@ class Playground extends React.Component {
       this.setState({ busy: false })
     }
   }
+
+  static TestCodeHeader = ({ onToggleVisible, active }) => (
+    <Grid columns='equal'>
+      <Grid.Column>
+        <Header as='h2'>Test code</Header>
+      </Grid.Column>
+      <Grid.Column width={2} textAlign='right'>
+        <Menu icon='labeled' compact text size='tiny'>
+          <Menu.Item
+            name='show'
+            active={active}
+            onClick={onToggleVisible}
+            color='green'
+          >
+            <Icon name='code' />
+            Show code
+          </Menu.Item>
+        </Menu>
+      </Grid.Column>
+    </Grid>
+  )
 }
 
 export default withRouter(Playground)
