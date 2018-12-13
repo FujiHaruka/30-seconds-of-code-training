@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Button, Dimmer, Loader, Menu, Grid, Icon } from 'semantic-ui-react'
+import { Header, Button, Dimmer, Loader, Menu, Grid, Icon, Label } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import './Playground.css'
 import compileTest from './tester/compileTest'
@@ -8,6 +8,7 @@ import doTest from './tester/doTest'
 import Editor from './Editor'
 import c from 'classnames'
 import { formatTestResult } from './helpers'
+import store from 'store'
 
 class Playground extends React.Component {
   render () {
@@ -19,6 +20,7 @@ class Playground extends React.Component {
       testCode,
       visibleTestCode,
       resultText,
+      succeeded,
     } = this.state
     if (!snippet) {
       return null
@@ -29,7 +31,15 @@ class Playground extends React.Component {
           <Loader />
         </Dimmer>
 
-        <Header as='h1'>{snippet.id}</Header>
+        <Header as='h1'>
+          {snippet.id}
+          {
+            succeeded &&
+            <Label color='red' tag className='Playground-solved'>
+              Solved
+            </Label>
+          }
+        </Header>
         <p>
           {snippet.attributes.text.split('\n')[0]}
         </p>
@@ -84,6 +94,7 @@ class Playground extends React.Component {
       testCode: '',
       visibleTestCode: false,
       resultText: '',
+      succeeded: false,
     }
   }
 
@@ -96,6 +107,7 @@ class Playground extends React.Component {
         resultText: '',
         ready: false,
         visibleTestCode: false,
+        succeeded: false,
       })
       this.setSnippet()
       this.fetchTestCode()
@@ -108,9 +120,7 @@ class Playground extends React.Component {
     if (snippet) {
       // TODO: 引数を自動設定
       const initialCode =
-`function ${snippet.id} () {
-  /* Complete function! */
-}`
+`const ${snippet.id} = /* Complete code */`
       this.setState({
         snippet,
         editorText: initialCode,
@@ -125,9 +135,11 @@ class Playground extends React.Component {
       return
     }
     const testCode = await fetchTest(snippet.id)
+    const succeeded = store.get(snippet.id)
     this.setState({
       testCode,
       ready: true,
+      succeeded,
     })
   }
 
@@ -146,7 +158,7 @@ class Playground extends React.Component {
   }
 
   submit = async () => {
-    const { editorText: code, testCode } = this.state
+    const { editorText: code, testCode, snippet } = this.state
     let test
     try {
       test = compileTest(code, testCode)
@@ -158,7 +170,12 @@ class Playground extends React.Component {
     this.setState({ busy: true })
     try {
       const results = await doTest(test)
-      this.setState({ resultText: formatTestResult(results) })
+      const succeeded = results.every(({ ok }) => ok)
+      if (succeeded) {
+        store.set(snippet.id, true)
+        this.props.onSolved()
+      }
+      this.setState({ resultText: formatTestResult(results), succeeded })
     } finally {
       this.setState({ busy: false })
     }

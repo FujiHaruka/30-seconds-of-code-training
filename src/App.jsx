@@ -4,6 +4,7 @@ import Layout from './Layout'
 import Menu from './Menu'
 import Playground from './Playground'
 import fetchSnippets from './fetch/fetchSnippets'
+import store from 'store'
 
 class App extends Component {
   render () {
@@ -20,12 +21,27 @@ class App extends Component {
     super(props)
     this.state = {
       snippets: [],
+      solvedIds: {},
+      onSolved: this.onSolved,
     }
   }
 
   async componentDidMount () {
     const snippets = await fetchSnippets()
     this.setState({ snippets })
+    this.loadSolvedIds()
+  }
+
+  onSolved = () => {
+    this.loadSolvedIds()
+  }
+
+  loadSolvedIds () {
+    const { snippets } = this.state
+    const solvedIds = snippets.filter((snippet) =>
+      Boolean(store.get(snippet.id))
+    ).reduce((obj, snippet) => Object.assign(obj, { [snippet.id]: true }), {})
+    this.setState({ solvedIds })
   }
 }
 

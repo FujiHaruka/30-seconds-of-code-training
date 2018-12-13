@@ -1,10 +1,11 @@
 import React from 'react'
-import { Menu } from 'semantic-ui-react'
+import { Menu, Label } from 'semantic-ui-react'
 import { uniq } from 'ramda'
 import { NavLink, withRouter } from 'react-router-dom'
 
 class Sideber extends React.PureComponent {
   render () {
+    const { solvedIds } = this.props
     const { menus } = this.state
     return menus.map(([title, snippets]) => (
       <Menu.Item key={title}>
@@ -18,6 +19,9 @@ class Sideber extends React.PureComponent {
                 to={`/snippets/${snippet.id}`}
               >
                 {snippet.id}
+                { solvedIds[snippet.id] &&
+                  <Label circular color='red' empty />
+                }
               </Menu.Item>
             )
           }
@@ -28,7 +32,9 @@ class Sideber extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    this.state = { menus: [] }
+    this.state = {
+      menus: [],
+    }
   }
 
   componentDidUpdate (prevProps) {
@@ -46,7 +52,6 @@ class Sideber extends React.PureComponent {
         menus[category].push(snippet)
       })
       menus = Object.entries(menus)
-
       this.setState({ menus })
     }
   }
