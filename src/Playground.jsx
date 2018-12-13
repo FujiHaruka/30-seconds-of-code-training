@@ -120,7 +120,7 @@ class Playground extends React.Component {
     if (snippet) {
       // TODO: 引数を自動設定
       const initialCode =
-`const ${snippet.id} = /* Complete code */`
+`\nconst ${snippet.id} = /* Complete code */\n`
       this.setState({
         snippet,
         editorText: initialCode,
@@ -165,6 +165,7 @@ class Playground extends React.Component {
     } catch (err) {
       // Syntax error はここで補足される
       console.error(err)
+      this.setState({ resultText: 'SyntaxError: ' + err.message })
       return
     }
     this.setState({ busy: true })
