@@ -1,6 +1,7 @@
 import React from 'react'
 import { Grid, Menu } from 'semantic-ui-react'
 import './Layout.css'
+import About from './About'
 
 const Layout = ({ side: Side, main: Main, state }) => (
   <Grid className='Layout'>

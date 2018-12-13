@@ -1,8 +1,16 @@
-.Layout {
+.ui.grid.Layout {
   height: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .Layout-side {
+  height: 100%;
+  overflow-y: scroll;
+  position: relative;
+}
+
+.Layout-main {
   height: 100%;
   overflow-y: scroll;
 }

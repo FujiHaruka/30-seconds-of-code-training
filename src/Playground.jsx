@@ -31,6 +31,8 @@ class Playground extends React.Component {
           <Loader />
         </Dimmer>
 
+        <Header as='h1' color='grey' size='small'>30-seconds-of-code Training</Header>
+
         <Header as='h1'>
           {snippet.id}
           {
