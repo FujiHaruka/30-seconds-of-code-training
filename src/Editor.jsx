@@ -32,6 +32,7 @@ const Editor = ({
       tabSize: 2,
       useSoftTabs: true,
       printMargin: 20,
+      useWorker: false,
     }}
     editorProps={{
       $blockScrolling: Infinity,
