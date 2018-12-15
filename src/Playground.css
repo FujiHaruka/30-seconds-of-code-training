@@ -27,3 +27,7 @@
 .ui.tag.label.Playground-solved {
   margin-left: 20px;
 }
+
+.Playground-test-code-header {
+  margin-right: 0 !important;
+}

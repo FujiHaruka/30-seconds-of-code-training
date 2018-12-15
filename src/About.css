@@ -1,5 +1,17 @@
 .About {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  width: 100%;
+  background: #41474d;
+  color: #eee;
+  padding: 8px;
+  box-sizing: border-box;
+  font-size: small;
+  height: 80px;
+}
+
+.About a {
+  color: #88c4ff;
+}
+
+.About p {
+  margin-bottom: 0.5em;
 }

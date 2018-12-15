@@ -7,12 +7,20 @@ const Layout = ({ side: Side, main: Main, state }) => (
   <Grid className='Layout'>
     <Grid.Column
       className='Layout-side'
-      as={Menu}
-      inverted
-      vertical
       width={4}
     >
-      <Side {...state} />
+      <Grid.Row
+        className='Layout-side-upper'
+        as={Menu}
+        inverted
+        vertical
+        stretched
+      >
+        <Side {...state} />
+      </Grid.Row>
+      <Grid.Row
+        as={About}
+      />
     </Grid.Column>
     <Grid.Column
       stretched

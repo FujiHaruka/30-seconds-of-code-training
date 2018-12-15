@@ -185,7 +185,7 @@ class Playground extends React.Component {
   }
 
   static TestCodeHeader = ({ onToggleVisible, active }) => (
-    <Grid columns='equal'>
+    <Grid columns='equal' className='Playground-test-code-header'>
       <Grid.Column>
         <Header as='h2'>Test code</Header>
       </Grid.Column>

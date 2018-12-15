@@ -2,12 +2,23 @@
   height: 100%;
   margin-top: 0;
   margin-bottom: 0;
+  margin-left: 0;
 }
 
 .Layout-side {
   height: 100%;
+  overflow-y: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.Layout-side-upper {
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 1rem;
   overflow-y: scroll;
-  position: relative;
+  height: calc(100% - 80px);
+  border-radius: 0 !important;
 }
 
 .Layout-main {
