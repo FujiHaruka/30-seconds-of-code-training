@@ -33,3 +33,27 @@
 .Playground-test-code-header {
   margin-right: 0 !important;
 }
+
+.ui.modal.Share-modal {
+  text-align: center;
+}
+.ui.modal.Share-modal>.actions {
+  text-align: center;
+}
+
+.Share-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+.Share-actions div {
+  margin-left: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+}
+
+.Share-close-button {
+  padding: 8px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+}

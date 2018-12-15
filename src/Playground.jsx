@@ -1,5 +1,13 @@
 import React from 'react'
-import { Header, Button, Dimmer, Loader, Menu, Grid, Icon, Label } from 'semantic-ui-react'
+import { Header, Button, Dimmer, Loader, Menu, Grid, Icon, Label, Modal } from 'semantic-ui-react'
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  TwitterShareButton,
+  TwitterIcon,
+  LineShareButton,
+  LineIcon,
+} from 'react-share'
 import { withRouter } from 'react-router-dom'
 import './Playground.css'
 import compileTest from './tester/compileTest'
@@ -21,6 +29,7 @@ class Playground extends React.Component {
       visibleTestCode,
       resultText,
       succeeded,
+      shareActive,
     } = this.state
     if (!snippet) {
       return null
@@ -82,6 +91,32 @@ class Playground extends React.Component {
           resultText &&
           <pre className='Playground-result'><code dangerouslySetInnerHTML={{ __html: resultText }} /></pre>
         }
+
+        <Modal
+          open={shareActive}
+          basic
+          size='small'
+          centered
+          onClose={this.closeShare}
+          className='Share-modal'
+        >
+          <Header size='large' content={`🎉 Snippet "${snippet.id}" completed!`} />
+          <Modal.Content content='Share the result.' />
+          <Modal.Actions>
+            <div className='Share-actions'>
+              <FacebookShareButton
+                url={window.location.href}
+              ><FacebookIcon size={48} /></FacebookShareButton>
+              <TwitterShareButton
+                url={window.location.href}
+              ><TwitterIcon size={48} /></TwitterShareButton>
+              <LineShareButton
+                url={window.location.href}
+              ><LineIcon size={48} /></LineShareButton>
+            </div>
+            <span className='Share-close-button' onClick={this.closeShare}>CLOSE</span>
+          </Modal.Actions>
+        </Modal>
       </div>
     )
   }
@@ -97,6 +132,7 @@ class Playground extends React.Component {
       visibleTestCode: false,
       resultText: '',
       succeeded: false,
+      shareActive: false,
     }
     this.ref = React.createRef()
   }
@@ -179,6 +215,9 @@ class Playground extends React.Component {
       if (succeeded) {
         store.set(snippet.id, true)
         this.props.onSolved()
+        setTimeout(() => {
+          this.setState({ shareActive: true })
+        }, 500)
       }
       this.setState({ resultText: formatTestResult(results), succeeded })
       this.scrollToBottom()
@@ -192,6 +231,10 @@ class Playground extends React.Component {
     setTimeout(() => {
       self.scrollTop = self.scrollHeight
     }, 20)
+  }
+
+  closeShare = () => {
+    this.setState({ shareActive: false })
   }
 
   static TestCodeHeader = ({ onToggleVisible, active }) => (
