@@ -26,7 +26,7 @@ class Playground extends React.Component {
       return null
     }
     return (
-      <div className='Playground'>
+      <div className='Playground' ref={this.ref} id='Playground'>
         <Dimmer active={busy} inverted>
           <Loader />
         </Dimmer>
@@ -98,6 +98,7 @@ class Playground extends React.Component {
       resultText: '',
       succeeded: false,
     }
+    this.ref = React.createRef()
   }
 
   componentDidUpdate (prevProps) {
@@ -168,6 +169,7 @@ class Playground extends React.Component {
       // Syntax error はここで補足される
       console.error(err)
       this.setState({ resultText: 'SyntaxError: ' + err.message })
+      this.scrollToBottom()
       return
     }
     this.setState({ busy: true })
@@ -179,9 +181,17 @@ class Playground extends React.Component {
         this.props.onSolved()
       }
       this.setState({ resultText: formatTestResult(results), succeeded })
+      this.scrollToBottom()
     } finally {
       this.setState({ busy: false })
     }
+  }
+
+  scrollToBottom = () => {
+    const self = this.ref.current
+    setTimeout(() => {
+      self.scrollTop = self.scrollHeight
+    }, 20)
   }
 
   static TestCodeHeader = ({ onToggleVisible, active }) => (
