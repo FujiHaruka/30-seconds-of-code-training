@@ -17,7 +17,7 @@ class Playground extends React.Component {
   render () {
     const {
       ready,
-      busy,
+      busyResult,
       snippet,
       editorText,
       testCode,
@@ -32,10 +32,6 @@ class Playground extends React.Component {
     }
     return (
       <div className='Playground' ref={this.ref} id='Playground'>
-        <Dimmer active={busy} inverted>
-          <Loader />
-        </Dimmer>
-
         <Header as='h1' color='grey' size='small'>30-seconds-of-code Training</Header>
 
         <SnippetHeader
@@ -86,7 +82,12 @@ class Playground extends React.Component {
 
         {
           resultText &&
-          <pre className='Playground-result'><code dangerouslySetInnerHTML={{ __html: resultText }} /></pre>
+          <pre className='Playground-result'>
+            <Dimmer active={busyResult} inverted>
+              <Loader />
+            </Dimmer>
+            <code dangerouslySetInnerHTML={{ __html: resultText }} />
+          </pre>
         }
 
         <ShareModal
@@ -102,7 +103,7 @@ class Playground extends React.Component {
     super(props)
     this.state = {
       ready: false,
-      busy: false,
+      busyResult: false,
       snippet: null,
       editorText: '',
       testCode: '',
@@ -187,26 +188,19 @@ class Playground extends React.Component {
     } catch (err) {
       // Syntax error はここで補足される
       console.error(err)
-      this.setState({ resultText: 'SyntaxError: ' + err.message })
-      this.scrollToBottom()
+      this.showResult('SyntaxError: ' + err.message)
       return
     }
-    this.setState({ busy: true })
-    try {
-      const results = await doTest(test)
-      const succeeded = results.every(({ ok }) => ok)
-      if (succeeded) {
-        store.set(snippet.id, true)
-        this.props.onSolved()
-        setTimeout(() => {
-          this.setState({ shareActive: true })
-        }, 500)
-      }
-      this.setState({ resultText: formatTestResult(results), succeeded })
-      this.scrollToBottom()
-    } finally {
-      this.setState({ busy: false })
+    const results = await doTest(test)
+    const succeeded = results.every(({ ok }) => ok)
+    if (succeeded) {
+      store.set(snippet.id, true)
+      this.props.onSolved()
+      setTimeout(() => {
+        this.setState({ shareActive: true })
+      }, 500)
     }
+    this.showResult(formatTestResult(results), true)
   }
 
   scrollToBottom = () => {
@@ -218,6 +212,23 @@ class Playground extends React.Component {
 
   closeShare = () => {
     this.setState({ shareActive: false })
+  }
+
+  showResult = (resultText, succeeded = false) => {
+    // 表示する前に少しロードアニメーション
+    this.setState({
+      busyResult: true,
+    })
+    setTimeout(() => {
+      this.setState({
+        busyResult: false,
+        resultText,
+      })
+      if (succeeded) {
+        this.setState({ succeeded })
+      }
+      this.scrollToBottom()
+    }, 300)
   }
 }
 
