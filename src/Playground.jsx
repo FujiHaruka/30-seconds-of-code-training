@@ -32,7 +32,7 @@ class Playground extends React.Component {
     }
     return (
       <div className='Playground' ref={this.ref} id='Playground'>
-        <Header as='h1' color='grey' size='small'>30-seconds-of-code Training</Header>
+        <Header as='h1' color='grey' size='small'>30-seconds-of-code Training (JavaScript)</Header>
 
         <SnippetHeader
           snippet={snippet}
