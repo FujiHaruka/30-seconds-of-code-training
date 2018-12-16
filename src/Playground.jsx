@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Button, Dimmer, Loader, Menu, Grid, Icon, Label, Modal } from 'semantic-ui-react'
+import { Header, Button, Dimmer, Loader } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import './Playground.css'
 import compileTest from './tester/compileTest'
@@ -11,6 +11,7 @@ import { formatTestResult } from './helpers'
 import store from 'store'
 import TestCodeHeader from './playground/TestCodeHeader'
 import ShareModal from './playground/ShareModal'
+import SnippetHeader from './playground/SnippetHeader'
 
 class Playground extends React.Component {
   render () {
@@ -21,6 +22,7 @@ class Playground extends React.Component {
       editorText,
       testCode,
       visibleTestCode,
+      visibleHint,
       resultText,
       succeeded,
       shareActive,
@@ -36,18 +38,19 @@ class Playground extends React.Component {
 
         <Header as='h1' color='grey' size='small'>30-seconds-of-code Training</Header>
 
-        <Header as='h1'>
-          {snippet.id}
-          {
-            succeeded &&
-            <Label color='red' tag className='Playground-solved'>
-              Solved
-            </Label>
-          }
-        </Header>
+        <SnippetHeader
+          snippet={snippet}
+          solved={succeeded}
+          onToggleHint={this.toggleHintVisible}
+          hintActive={visibleHint}
+        />
         <p>
           {snippet.attributes.text.split('\n')[0]}
         </p>
+        {
+          visibleHint &&
+          <p>{snippet.attributes.text.split('\n').filter(Boolean)[1]}</p>
+        }
         <Editor
           name='code'
           className='Playground-code'
@@ -104,6 +107,7 @@ class Playground extends React.Component {
       editorText: '',
       testCode: '',
       visibleTestCode: false,
+      visibleHint: false,
       resultText: '',
       succeeded: false,
       shareActive: false,
@@ -168,6 +172,11 @@ class Playground extends React.Component {
   toggleVisibleTestCode = () => {
     const { visibleTestCode } = this.state
     this.setState({ visibleTestCode: !visibleTestCode })
+  }
+
+  toggleHintVisible = () => {
+    const { visibleHint } = this.state
+    this.setState({ visibleHint: !visibleHint })
   }
 
   submit = async () => {

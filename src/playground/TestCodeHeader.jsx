@@ -6,7 +6,7 @@ const TestCodeHeader = ({ onToggleVisible, active }) => (
     <Grid.Column>
       <Header as='h2'>Test code</Header>
     </Grid.Column>
-    <Grid.Column width={2} textAlign='right'>
+    <Grid.Column width={2} textAlign='right' className='Playground-header-menu'>
       <Menu icon='labeled' compact text size='tiny'>
         <Menu.Item
           name='show'
