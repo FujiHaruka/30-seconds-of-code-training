@@ -1,13 +1,5 @@
 import React from 'react'
 import { Header, Button, Dimmer, Loader, Menu, Grid, Icon, Label, Modal } from 'semantic-ui-react'
-import {
-  FacebookShareButton,
-  FacebookIcon,
-  TwitterShareButton,
-  TwitterIcon,
-  LineShareButton,
-  LineIcon,
-} from 'react-share'
 import { withRouter } from 'react-router-dom'
 import './Playground.css'
 import compileTest from './tester/compileTest'
@@ -17,6 +9,8 @@ import Editor from './Editor'
 import c from 'classnames'
 import { formatTestResult } from './helpers'
 import store from 'store'
+import TestCodeHeader from './playground/TestCodeHeader'
+import ShareModal from './playground/ShareModal'
 
 class Playground extends React.Component {
   render () {
@@ -67,7 +61,7 @@ class Playground extends React.Component {
           value={snippet.attributes.codeBlocks.example}
           readOnly
         />
-        <Playground.TestCodeHeader
+        <TestCodeHeader
           onToggleVisible={this.toggleVisibleTestCode}
           active={visibleTestCode}
         />
@@ -92,31 +86,11 @@ class Playground extends React.Component {
           <pre className='Playground-result'><code dangerouslySetInnerHTML={{ __html: resultText }} /></pre>
         }
 
-        <Modal
+        <ShareModal
           open={shareActive}
-          basic
-          size='small'
-          centered
           onClose={this.closeShare}
-          className='Share-modal'
-        >
-          <Header size='large' content={`🎉 Snippet "${snippet.id}" completed!`} />
-          <Modal.Content content='Share the result.' />
-          <Modal.Actions>
-            <div className='Share-actions'>
-              <FacebookShareButton
-                url={window.location.href}
-              ><FacebookIcon size={48} /></FacebookShareButton>
-              <TwitterShareButton
-                url={window.location.href}
-              ><TwitterIcon size={48} /></TwitterShareButton>
-              <LineShareButton
-                url={window.location.href}
-              ><LineIcon size={48} /></LineShareButton>
-            </div>
-            <span className='Share-close-button' onClick={this.closeShare}>CLOSE</span>
-          </Modal.Actions>
-        </Modal>
+          snippet={snippet}
+        />
       </div>
     )
   }
@@ -236,27 +210,6 @@ class Playground extends React.Component {
   closeShare = () => {
     this.setState({ shareActive: false })
   }
-
-  static TestCodeHeader = ({ onToggleVisible, active }) => (
-    <Grid columns='equal' className='Playground-test-code-header'>
-      <Grid.Column>
-        <Header as='h2'>Test code</Header>
-      </Grid.Column>
-      <Grid.Column width={2} textAlign='right'>
-        <Menu icon='labeled' compact text size='tiny'>
-          <Menu.Item
-            name='show'
-            active={active}
-            onClick={onToggleVisible}
-            color='green'
-          >
-            <Icon name='code' />
-            Show code
-          </Menu.Item>
-        </Menu>
-      </Grid.Column>
-    </Grid>
-  )
 }
 
 export default withRouter(Playground)
