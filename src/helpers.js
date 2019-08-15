@@ -12,7 +12,7 @@ export function formatTestResult (results = []) {
           .filter(Boolean)
           .map(line => '  > ' + line)
           .join('\n')
-        return `ERROR: ${name}` + '\n' + message
+        return `ERROR: ${name}\n${message}`
       } else {
         return `ERROR: ${name}`
       }
