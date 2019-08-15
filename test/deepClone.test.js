@@ -1,22 +1,35 @@
-const expect = require('expect');
 const {deepClone} = require('./_30s.js');
 
 test('deepClone is a Function', () => {
   expect(deepClone).toBeInstanceOf(Function);
 });
-const a = { foo: 'bar', obj: { a: 1, b: 2 } };
-const b = deepClone(a);
-const c = [{ foo: 'bar' }];
-const d = deepClone(c);
+const data = {
+  a: [],
+  b: [1, 2, 3],
+  c: [{ foo: 'bar' }],
+  d: {},
+  e: { a: 'a', b: 'b', c: 'c', d: ['a', 'b', 'c'] },
+  f: 1,
+  g: true
+};
+const dupe = deepClone(data);
 test('Shallow cloning works', () => {
-  expect(a).not.toBe(b);
+  expect(data).not.toBe(dupe);
 });
-test('Deep cloning works', () => {
-  expect(a.obj).not.toBe(b.obj);
+test('Array shallow cloning edge case works', () => {
+  expect(dupe.a).toEqual([]);
 });
 test('Array shallow cloning works', () => {
-  expect(c).not.toBe(d);
+  expect(data.b).not.toBe(dupe.b);
 });
 test('Array deep cloning works', () => {
-  expect(c[0]).not.toBe(d[0]);
+  expect(data.c[0]).not.toBe(dupe.c[0]);
+});
+test('Deep cloning works', () => {
+  expect(data.d).not.toBe(dupe.d);
+  expect(data.e).not.toBe(dupe.e);
+});
+test('Cloning primitives works', () => {
+  expect(data.f).toBe(dupe.f);
+  expect(data.g).toBe(dupe.g);
 });

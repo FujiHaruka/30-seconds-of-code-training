@@ -53,7 +53,9 @@ const allEqual = arr => arr.every(val => val === arr[0]);
 const any = (arr, fn = Boolean) => arr.some(fn);
 const approximatelyEqual = (v1, v2, epsilon = 0.001) => Math.abs(v1 - v2) < epsilon;
 const arrayToCSV = (arr, delimiter = ',') =>
-  arr.map(v => v.map(x => `"${x}"`).join(delimiter)).join('\n');
+  arr
+    .map(v => v.map(x => (isNaN(x) ? `"${x.replace(/"/g, '""')}"` : x)).join(delimiter))
+    .join('\n');
 const arrayToHtmlList = (arr, listID) =>
   (el => (
     (el = document.querySelector('#' + listID)),
@@ -110,9 +112,14 @@ const capitalizeEveryWord = str => str.replace(/\b[a-z]/g, char => char.toUpperC
 const castArray = val => (Array.isArray(val) ? val : [val]);
 const chainAsync = fns => {
   let curr = 0;
-  const next = () => fns[curr++](next);
+  const last = fns[fns.length - 1];
+  const next = () => {
+    const fn = fns[curr++];
+    fn === last ? fn() : fn(next);
+  };
   next();
 };
+const checkProp = (predicate, prop) => obj => !!predicate(obj[prop]);
 const chunk = (arr, size) =>
   Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
     arr.slice(i * size, i * size + size)
@@ -141,6 +148,7 @@ const colorize = (...args) => ({
   bgWhite: `\x1b[47m${args.join(' ')}\x1b[0m`
 });
 const compact = arr => arr.filter(Boolean);
+const compactWhitespace = str => str.replace(/\s{2,}/g, ' ');
 const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
 const composeRight = (...fns) => fns.reduce((f, g) => (...args) => g(f(...args)));
 const converge = (converger, fns) => (...args) => converger(...fns.map(fn => fn.apply(null, args)));
@@ -178,6 +186,8 @@ const counter = (selector, start, end, step = 1, duration = 2000) => {
     }, Math.abs(Math.floor(duration / (end - start))));
   return timer;
 };
+
+const createDirIfNotExists = dir => (!fs.existsSync(dir) ? fs.mkdirSync(dir) : undefined);
 const createElement = str => {
   const el = document.createElement('div');
   el.innerHTML = str;
@@ -195,6 +205,7 @@ const createEventHub = () => ({
   off(event, handler) {
     const i = (this.hub[event] || []).findIndex(h => h === handler);
     if (i > -1) this.hub[event].splice(i, 1);
+    if (this.hub[event].length === 0) delete this.hub[event];
   }
 });
 const currentURL = () => window.location.href;
@@ -216,7 +227,11 @@ const deepClone = obj => {
   Object.keys(clone).forEach(
     key => (clone[key] = typeof obj[key] === 'object' ? deepClone(obj[key]) : obj[key])
   );
-  return Array.isArray(obj) ? (clone.length = obj.length) && Array.from(clone) : clone;
+  return Array.isArray(obj) && obj.length
+    ? (clone.length = obj.length) && Array.from(clone)
+    : Array.isArray(obj)
+      ? Array.from(obj)
+      : clone;
 };
 const deepFlatten = arr => [].concat(...arr.map(v => (Array.isArray(v) ? deepFlatten(v) : v)));
 const deepFreeze = obj =>
@@ -224,6 +239,18 @@ const deepFreeze = obj =>
     prop =>
       !(obj[prop] instanceof Object) || Object.isFrozen(obj[prop]) ? null : deepFreeze(obj[prop])
   ) || Object.freeze(obj);
+const deepGet = (obj, keys) => keys.reduce((xs, x) => (xs && xs[x] ? xs[x] : null), obj);
+const deepMapKeys = (obj, f) =>
+  Array.isArray(obj)
+    ? obj.map(val => deepMapKeys(val, f))
+    : typeof obj === 'object'
+      ? Object.keys(obj).reduce((acc, current) => {
+        const val = obj[current];
+        acc[f(current)] =
+            val !== null && typeof val === 'object' ? deepMapKeys(val, f) : (acc[f(current)] = val);
+        return acc;
+      }, {})
+      : obj;
 const defaults = (obj, ...defs) => Object.assign({}, obj, ...defs.reverse(), obj);
 const defer = (fn, ...args) => setTimeout(fn, 1, ...args);
 const degreesToRads = deg => (deg * Math.PI) / 180.0;
@@ -238,7 +265,7 @@ const difference = (a, b) => {
 };
 const differenceBy = (a, b, fn) => {
   const s = new Set(b.map(fn));
-  return a.filter(x => !s.has(fn(x)));
+  return a.map(fn).filter(el => !s.has(el));
 };
 const differenceWith = (arr, val, comp) => arr.filter(a => val.findIndex(b => comp(a, b)) === -1);
 const dig = (obj, target) =>
@@ -253,8 +280,9 @@ const distance = (x0, y0, x1, y1) => Math.hypot(x1 - x0, y1 - y0);
 const drop = (arr, n = 1) => arr.slice(n);
 const dropRight = (arr, n = 1) => arr.slice(0, -n);
 const dropRightWhile = (arr, func) => {
-  while (arr.length > 0 && !func(arr[arr.length - 1])) arr = arr.slice(0, -1);
-  return arr;
+  let rightIndex = arr.length;
+  while (rightIndex-- && !func(arr[rightIndex]));
+  return arr.slice(0, rightIndex + 1);
 };
 const dropWhile = (arr, func) => {
   while (arr.length > 0 && !func(arr[0])) arr = arr.slice(1);
@@ -336,10 +364,10 @@ const filterNonUniqueBy = (arr, fn) =>
 const findKey = (obj, fn) => Object.keys(obj).find(key => fn(obj[key], key, obj));
 const findLast = (arr, fn) => arr.filter(fn).pop();
 const findLastIndex = (arr, fn) =>
-  arr
+  (arr
     .map((val, i) => [i, val])
     .filter(([i, val]) => fn(val, i, arr))
-    .pop()[0];
+    .pop() || [-1])[0];
 const findLastKey = (obj, fn) =>
   Object.keys(obj)
     .reverse()
@@ -364,6 +392,14 @@ const forOwnRight = (obj, fn) =>
   Object.keys(obj)
     .reverse()
     .forEach(key => fn(obj[key], key, obj));
+const formToObject = form =>
+  Array.from(new FormData(form)).reduce(
+    (acc, [key, value]) => ({
+      ...acc,
+      [key]: value
+    }),
+    {}
+  );
 const formatDuration = ms => {
   if (ms < 0) ms = -ms;
   const time = {
@@ -579,7 +615,7 @@ const isLowerCase = str => str === str.toLowerCase();
 const isNegativeZero = val => val === 0 && 1 / val === -Infinity;
 const isNil = val => val === undefined || val === null;
 const isNull = val => val === null;
-const isNumber = val => typeof val === 'number';
+const isNumber = val => typeof val === 'number' && val === val;
 const isObject = obj => obj === Object(obj);
 const isObjectLike = val => val !== null && typeof val === 'object';
 const isPlainObject = val => !!val && typeof val === 'object' && val.constructor === Object;
@@ -621,6 +657,12 @@ const isValidJSON = str => {
   } catch (e) {
     return false;
   }
+};
+const isWeekday = (t = new Date()) => {
+  return t.getDay() % 6 !== 0;
+};
+const isWeekend = (t = new Date()) => {
+  return t.getDay() % 6 === 0;
 };
 const isWritableStream = val =>
   val !== null &&
@@ -665,6 +707,8 @@ const mapKeys = (obj, fn) =>
     acc[fn(obj[k], k, obj)] = obj[k];
     return acc;
   }, {});
+const mapNumRange = (num, inMin, inMax, outMin, outMax) =>
+  ((num - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 const mapObject = (arr, fn) =>
   (a => (
     (a = [arr, arr.map(fn)]), a[0].reduce((acc, val, ind) => ((acc[val] = a[1][ind]), acc), {})
@@ -690,7 +734,7 @@ const matchesWith = (obj, source, fn) =>
         : obj[key] == source[key]
   );
 const maxBy = (arr, fn) => Math.max(...arr.map(typeof fn === 'function' ? fn : val => val[fn]));
-const maxDate = (...dates) => new Date(Math.max.apply(null, ...dates));
+const maxDate = dates => new Date(Math.max(...dates));
 const maxN = (arr, n = 1) => [...arr].sort((a, b) => b - a).slice(0, n);
 const median = arr => {
   const mid = Math.floor(arr.length / 2),
@@ -716,7 +760,7 @@ const merge = (...objs) =>
   );
 const midpoint = ([x1, y1], [x2, y2]) => [(x1 + x2) / 2, (y1 + y2) / 2];
 const minBy = (arr, fn) => Math.min(...arr.map(typeof fn === 'function' ? fn : val => val[fn]));
-const minDate = (...dates) => new Date(Math.min.apply(null, ...dates));
+const minDate = dates => new Date(Math.min(...dates));
 const minN = (arr, n = 1) => [...arr].sort((a, b) => a - b).slice(0, n);
 const mostPerformant = (fns, iterations = 10000) => {
   const times = fns.map(fn => {
@@ -1022,6 +1066,8 @@ const sdbm = str => {
   );
 };
 const serializeCookie = (name, val) => `${encodeURIComponent(name)}=${encodeURIComponent(val)}`;
+const serializeForm = form =>
+  Array.from(new FormData(form), field => field.map(encodeURIComponent).join('=')).join('&');
 const setStyle = (el, ruleName, val) => (el.style[ruleName] = val);
 const shallowClone = obj => Object.assign({}, obj);
 const shank = (arr, index = 0, delCount = 0, ...elements) =>
@@ -1212,13 +1258,10 @@ const toTitleCase = str =>
     .map(x => x.charAt(0).toUpperCase() + x.slice(1))
     .join(' ');
 const toggleClass = (el, className) => el.classList.toggle(className);
-const tomorrow = (long = false) => {
+const tomorrow = () => {
   let t = new Date();
   t.setDate(t.getDate() + 1);
-  const ret = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(
-    t.getDate()
-  ).padStart(2, '0')}`;
-  return !long ? ret : `${ret}T00:00:00`;
+  return t.toISOString().split('T')[0];
 };
 const transform = (obj, fn, acc) => Object.keys(obj).reduce((a, k) => fn(a, obj[k], k, obj), acc);
 const triggerEvent = (el, eventType, detail) =>
@@ -1305,12 +1348,24 @@ const unzipWith = (arr, fn) =>
     )
     .map(val => fn(...val));
 const validateNumber = n => !isNaN(parseFloat(n)) && isFinite(n) && Number(n) == n;
+const vectorDistance = (...coords) => {
+  let pointLength = Math.trunc(coords.length / 2);
+  let sum = coords
+    .slice(0, pointLength)
+    .reduce((acc, val, i) => acc + Math.pow(val - coords[pointLength + i], 2), 0);
+  return Math.sqrt(sum);
+};
 const when = (pred, whenTrue) => x => (pred(x) ? whenTrue(x) : x);
 const without = (arr, ...args) => arr.filter(v => !args.includes(v));
 const words = (str, pattern = /[^a-zA-Z-]+/) => str.split(pattern).filter(Boolean);
 const xProd = (a, b) => a.reduce((acc, x) => acc.concat(b.map(y => [x, y])), []);
 const yesNo = (val, def = false) =>
   /^(y|yes)$/i.test(val) ? true : /^(n|no)$/i.test(val) ? false : def;
+const yesterday = () => {
+  let t = new Date();
+  t.setDate(t.getDate() - 1);
+  return t.toISOString().split('T')[0];
+};
 const zip = (...arrays) => {
   const maxLength = Math.max(...arrays.map(x => x.length));
   return Array.from({ length: maxLength }).map((_, i) => {
@@ -1492,4 +1547,4 @@ const speechSynthesis = message => {
 const squareSum = (...args) => args.reduce((squareSum, number) => squareSum + Math.pow(number, 2), 0);
 
 
-module.exports = {CSVToArray,CSVToJSON,JSONToFile,JSONtoCSV,RGBToHex,URLJoin,UUIDGeneratorBrowser,UUIDGeneratorNode,all,allEqual,any,approximatelyEqual,arrayToCSV,arrayToHtmlList,ary,atob,attempt,average,averageBy,bifurcate,bifurcateBy,bind,bindAll,bindKey,binomialCoefficient,bottomVisible,btoa,byteSize,call,capitalize,capitalizeEveryWord,castArray,chainAsync,chunk,clampNumber,cloneRegExp,coalesce,coalesceFactory,collectInto,colorize,compact,compose,composeRight,converge,copyToClipboard,countBy,countOccurrences,counter,createElement,createEventHub,currentURL,curry,dayOfYear,debounce,decapitalize,deepClone,deepFlatten,deepFreeze,defaults,defer,degreesToRads,delay,detectDeviceType,difference,differenceBy,differenceWith,dig,digitize,distance,drop,dropRight,dropRightWhile,dropWhile,elementContains,elementIsVisibleInViewport,elo,equals,escapeHTML,escapeRegExp,everyNth,extendHex,factorial,fibonacci,filterFalsy,filterNonUnique,filterNonUniqueBy,findKey,findLast,findLastIndex,findLastKey,flatten,flattenObject,flip,forEachRight,forOwn,forOwnRight,formatDuration,fromCamelCase,functionName,functions,gcd,geometricProgression,get,getColonTimeFromDate,getDaysDiffBetweenDates,getImages,getMeridiemSuffixOfInteger,getScrollPosition,getStyle,getType,getURLParameters,groupBy,hammingDistance,hasClass,hasFlags,hashBrowser,hashNode,head,hexToRGB,hide,httpGet,httpPost,httpsRedirect,hz,inRange,indentString,indexOfAll,initial,initialize2DArray,initializeArrayWithRange,initializeArrayWithRangeRight,initializeArrayWithValues,initializeNDArray,insertAfter,insertBefore,intersection,intersectionBy,intersectionWith,invertKeyValues,is,isAbsoluteURL,isAfterDate,isAnagram,isArrayLike,isBeforeDate,isBoolean,isBrowser,isBrowserTabFocused,isDivisible,isDuplexStream,isEmpty,isEven,isFunction,isLowerCase,isNegativeZero,isNil,isNull,isNumber,isObject,isObjectLike,isPlainObject,isPrime,isPrimitive,isPromiseLike,isReadableStream,isSameDate,isSorted,isStream,isString,isSymbol,isTravisCI,isUndefined,isUpperCase,isValidJSON,isWritableStream,join,last,lcm,longestItem,lowercaseKeys,luhnCheck,mapKeys,mapObject,mapString,mapValues,mask,matches,matchesWith,maxBy,maxDate,maxN,median,memoize,merge,midpoint,minBy,minDate,minN,mostPerformant,negate,nest,nodeListToArray,none,nthArg,nthElement,objectFromPairs,objectToPairs,observeMutations,off,offset,omit,omitBy,on,onUserInputChange,once,orderBy,over,overArgs,pad,palindrome,parseCookie,partial,partialRight,partition,percentile,permutations,pick,pickBy,pipeAsyncFunctions,pipeFunctions,pluralize,powerset,prefix,prettyBytes,primes,promisify,pull,pullAtIndex,pullAtValue,pullBy,radsToDegrees,randomHexColorCode,randomIntArrayInRange,randomIntegerInRange,randomNumberInRange,readFileLines,rearg,recordAnimationFrames,redirect,reduceSuccessive,reduceWhich,reducedFilter,reject,remove,removeNonASCII,renameKeys,reverseString,round,runAsync,runPromisesInSeries,sample,sampleSize,scrollToTop,sdbm,serializeCookie,setStyle,shallowClone,shank,show,shuffle,similarity,size,sleep,smoothScroll,sortCharactersInString,sortedIndex,sortedIndexBy,sortedLastIndex,sortedLastIndexBy,splitLines,spreadOver,stableSort,standardDeviation,stringPermutations,stripHTMLTags,sum,sumBy,sumPower,symmetricDifference,symmetricDifferenceBy,symmetricDifferenceWith,tail,take,takeRight,takeRightWhile,takeWhile,throttle,timeTaken,times,toCamelCase,toCurrency,toDecimalMark,toHash,toKebabCase,toOrdinalSuffix,toSafeInteger,toSnakeCase,toTitleCase,toggleClass,tomorrow,transform,triggerEvent,truncateString,truthCheckCollection,unary,uncurry,unescapeHTML,unflattenObject,unfold,union,unionBy,unionWith,uniqueElements,uniqueElementsBy,uniqueElementsByRight,uniqueSymmetricDifference,untildify,unzip,unzipWith,validateNumber,when,without,words,xProd,yesNo,zip,zipObject,zipWith,JSONToDate,binarySearch,celsiusToFahrenheit,cleanObj,collatz,countVowels,factors,fahrenheitToCelsius,fibonacciCountUntilNum,fibonacciUntilNum,heronArea,howManyTimes,httpDelete,httpPut,isArmstrongNumber,isSimilar,kmphToMph,levenshteinDistance,mphToKmph,pipeLog,quickSort,removeVowels,solveRPN,speechSynthesis,squareSum}
+module.exports = {CSVToArray,CSVToJSON,JSONToFile,JSONtoCSV,RGBToHex,URLJoin,UUIDGeneratorBrowser,UUIDGeneratorNode,all,allEqual,any,approximatelyEqual,arrayToCSV,arrayToHtmlList,ary,atob,attempt,average,averageBy,bifurcate,bifurcateBy,bind,bindAll,bindKey,binomialCoefficient,bottomVisible,btoa,byteSize,call,capitalize,capitalizeEveryWord,castArray,chainAsync,checkProp,chunk,clampNumber,cloneRegExp,coalesce,coalesceFactory,collectInto,colorize,compact,compactWhitespace,compose,composeRight,converge,copyToClipboard,countBy,countOccurrences,counter,createDirIfNotExists,createElement,createEventHub,currentURL,curry,dayOfYear,debounce,decapitalize,deepClone,deepFlatten,deepFreeze,deepGet,deepMapKeys,defaults,defer,degreesToRads,delay,detectDeviceType,difference,differenceBy,differenceWith,dig,digitize,distance,drop,dropRight,dropRightWhile,dropWhile,elementContains,elementIsVisibleInViewport,elo,equals,escapeHTML,escapeRegExp,everyNth,extendHex,factorial,fibonacci,filterFalsy,filterNonUnique,filterNonUniqueBy,findKey,findLast,findLastIndex,findLastKey,flatten,flattenObject,flip,forEachRight,forOwn,forOwnRight,formToObject,formatDuration,fromCamelCase,functionName,functions,gcd,geometricProgression,get,getColonTimeFromDate,getDaysDiffBetweenDates,getImages,getMeridiemSuffixOfInteger,getScrollPosition,getStyle,getType,getURLParameters,groupBy,hammingDistance,hasClass,hasFlags,hashBrowser,hashNode,head,hexToRGB,hide,httpGet,httpPost,httpsRedirect,hz,inRange,indentString,indexOfAll,initial,initialize2DArray,initializeArrayWithRange,initializeArrayWithRangeRight,initializeArrayWithValues,initializeNDArray,insertAfter,insertBefore,intersection,intersectionBy,intersectionWith,invertKeyValues,is,isAbsoluteURL,isAfterDate,isAnagram,isArrayLike,isBeforeDate,isBoolean,isBrowser,isBrowserTabFocused,isDivisible,isDuplexStream,isEmpty,isEven,isFunction,isLowerCase,isNegativeZero,isNil,isNull,isNumber,isObject,isObjectLike,isPlainObject,isPrime,isPrimitive,isPromiseLike,isReadableStream,isSameDate,isSorted,isStream,isString,isSymbol,isTravisCI,isUndefined,isUpperCase,isValidJSON,isWeekday,isWeekend,isWritableStream,join,last,lcm,longestItem,lowercaseKeys,luhnCheck,mapKeys,mapNumRange,mapObject,mapString,mapValues,mask,matches,matchesWith,maxBy,maxDate,maxN,median,memoize,merge,midpoint,minBy,minDate,minN,mostPerformant,negate,nest,nodeListToArray,none,nthArg,nthElement,objectFromPairs,objectToPairs,observeMutations,off,offset,omit,omitBy,on,onUserInputChange,once,orderBy,over,overArgs,pad,palindrome,parseCookie,partial,partialRight,partition,percentile,permutations,pick,pickBy,pipeAsyncFunctions,pipeFunctions,pluralize,powerset,prefix,prettyBytes,primes,promisify,pull,pullAtIndex,pullAtValue,pullBy,radsToDegrees,randomHexColorCode,randomIntArrayInRange,randomIntegerInRange,randomNumberInRange,readFileLines,rearg,recordAnimationFrames,redirect,reduceSuccessive,reduceWhich,reducedFilter,reject,remove,removeNonASCII,renameKeys,reverseString,round,runAsync,runPromisesInSeries,sample,sampleSize,scrollToTop,sdbm,serializeCookie,serializeForm,setStyle,shallowClone,shank,show,shuffle,similarity,size,sleep,smoothScroll,sortCharactersInString,sortedIndex,sortedIndexBy,sortedLastIndex,sortedLastIndexBy,splitLines,spreadOver,stableSort,standardDeviation,stringPermutations,stripHTMLTags,sum,sumBy,sumPower,symmetricDifference,symmetricDifferenceBy,symmetricDifferenceWith,tail,take,takeRight,takeRightWhile,takeWhile,throttle,timeTaken,times,toCamelCase,toCurrency,toDecimalMark,toHash,toKebabCase,toOrdinalSuffix,toSafeInteger,toSnakeCase,toTitleCase,toggleClass,tomorrow,transform,triggerEvent,truncateString,truthCheckCollection,unary,uncurry,unescapeHTML,unflattenObject,unfold,union,unionBy,unionWith,uniqueElements,uniqueElementsBy,uniqueElementsByRight,uniqueSymmetricDifference,untildify,unzip,unzipWith,validateNumber,vectorDistance,when,without,words,xProd,yesNo,yesterday,zip,zipObject,zipWith,JSONToDate,binarySearch,celsiusToFahrenheit,cleanObj,collatz,countVowels,factors,fahrenheitToCelsius,fibonacciCountUntilNum,fibonacciUntilNum,heronArea,howManyTimes,httpDelete,httpPut,isArmstrongNumber,isSimilar,kmphToMph,levenshteinDistance,mphToKmph,pipeLog,quickSort,removeVowels,solveRPN,speechSynthesis,squareSum}
