@@ -1,0 +1,3 @@
+[submodule "30-seconds-of-code"]
+	path = 30-seconds-of-code
+	url = https://github.com/30-seconds/30-seconds-of-code.git
