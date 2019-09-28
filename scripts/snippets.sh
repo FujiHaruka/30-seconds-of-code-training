@@ -2,5 +2,4 @@
 
 cp 30-seconds-of-code/snippet_data/snippets.json public/snippets.json
 
-rm -rf public/test
-cp -r 30-seconds-of-code/test public/test
+cp -r 30-seconds-of-code/test/*.js public/test/
