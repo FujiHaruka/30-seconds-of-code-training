@@ -1,18 +1,26 @@
 {
   "files": {
     "main.css": "/30-seconds-of-code-training/static/css/main.9c58eac3.chunk.css",
-    "main.js": "/30-seconds-of-code-training/static/js/main.efa530f0.chunk.js",
-    "main.js.map": "/30-seconds-of-code-training/static/js/main.efa530f0.chunk.js.map",
-    "runtime-main.js": "/30-seconds-of-code-training/static/js/runtime-main.b892cb46.js",
-    "runtime-main.js.map": "/30-seconds-of-code-training/static/js/runtime-main.b892cb46.js.map",
-    "static/css/2.037839e5.chunk.css": "/30-seconds-of-code-training/static/css/2.037839e5.chunk.css",
-    "static/js/2.77bab5b7.chunk.js": "/30-seconds-of-code-training/static/js/2.77bab5b7.chunk.js",
-    "static/js/2.77bab5b7.chunk.js.map": "/30-seconds-of-code-training/static/js/2.77bab5b7.chunk.js.map",
+    "main.js": "/30-seconds-of-code-training/static/js/main.c82ed321.chunk.js",
+    "main.js.map": "/30-seconds-of-code-training/static/js/main.c82ed321.chunk.js.map",
+    "runtime-main.js": "/30-seconds-of-code-training/static/js/runtime-main.b679efad.js",
+    "runtime-main.js.map": "/30-seconds-of-code-training/static/js/runtime-main.b679efad.js.map",
+    "static/css/2.ae12ecd5.chunk.css": "/30-seconds-of-code-training/static/css/2.ae12ecd5.chunk.css",
+    "static/js/2.bf39a89a.chunk.js": "/30-seconds-of-code-training/static/js/2.bf39a89a.chunk.js",
+    "static/js/2.bf39a89a.chunk.js.map": "/30-seconds-of-code-training/static/js/2.bf39a89a.chunk.js.map",
     "index.html": "/30-seconds-of-code-training/index.html",
-    "precache-manifest.4f486f1bc805fcc7755680df14fda97e.js": "/30-seconds-of-code-training/precache-manifest.4f486f1bc805fcc7755680df14fda97e.js",
+    "precache-manifest.8e9ab6ad6d245de4c6acb5efd472874e.js": "/30-seconds-of-code-training/precache-manifest.8e9ab6ad6d245de4c6acb5efd472874e.js",
     "service-worker.js": "/30-seconds-of-code-training/service-worker.js",
-    "static/css/2.037839e5.chunk.css.map": "/30-seconds-of-code-training/static/css/2.037839e5.chunk.css.map",
+    "static/css/2.ae12ecd5.chunk.css.map": "/30-seconds-of-code-training/static/css/2.ae12ecd5.chunk.css.map",
     "static/css/main.9c58eac3.chunk.css.map": "/30-seconds-of-code-training/static/css/main.9c58eac3.chunk.css.map",
+    "static/js/2.bf39a89a.chunk.js.LICENSE": "/30-seconds-of-code-training/static/js/2.bf39a89a.chunk.js.LICENSE",
     "static/media/semantic.min.css": "/30-seconds-of-code-training/static/media/outline-icons.ef60a4f6.woff"
-  }
+  },
+  "entrypoints": [
+    "static/js/runtime-main.b679efad.js",
+    "static/css/2.ae12ecd5.chunk.css",
+    "static/js/2.bf39a89a.chunk.js",
+    "static/css/main.9c58eac3.chunk.css",
+    "static/js/main.c82ed321.chunk.js"
+  ]
 }
