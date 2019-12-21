@@ -1,26 +1,26 @@
 {
   "files": {
     "main.css": "/30-seconds-of-code-training/static/css/main.9c58eac3.chunk.css",
-    "main.js": "/30-seconds-of-code-training/static/js/main.c82ed321.chunk.js",
-    "main.js.map": "/30-seconds-of-code-training/static/js/main.c82ed321.chunk.js.map",
-    "runtime-main.js": "/30-seconds-of-code-training/static/js/runtime-main.b679efad.js",
-    "runtime-main.js.map": "/30-seconds-of-code-training/static/js/runtime-main.b679efad.js.map",
+    "main.js": "/30-seconds-of-code-training/static/js/main.3d6e8a48.chunk.js",
+    "main.js.map": "/30-seconds-of-code-training/static/js/main.3d6e8a48.chunk.js.map",
+    "runtime-main.js": "/30-seconds-of-code-training/static/js/runtime-main.5651f455.js",
+    "runtime-main.js.map": "/30-seconds-of-code-training/static/js/runtime-main.5651f455.js.map",
     "static/css/2.ae12ecd5.chunk.css": "/30-seconds-of-code-training/static/css/2.ae12ecd5.chunk.css",
-    "static/js/2.bf39a89a.chunk.js": "/30-seconds-of-code-training/static/js/2.bf39a89a.chunk.js",
-    "static/js/2.bf39a89a.chunk.js.map": "/30-seconds-of-code-training/static/js/2.bf39a89a.chunk.js.map",
+    "static/js/2.7bcedf69.chunk.js": "/30-seconds-of-code-training/static/js/2.7bcedf69.chunk.js",
+    "static/js/2.7bcedf69.chunk.js.map": "/30-seconds-of-code-training/static/js/2.7bcedf69.chunk.js.map",
     "index.html": "/30-seconds-of-code-training/index.html",
-    "precache-manifest.8e9ab6ad6d245de4c6acb5efd472874e.js": "/30-seconds-of-code-training/precache-manifest.8e9ab6ad6d245de4c6acb5efd472874e.js",
+    "precache-manifest.6dacf4f700b107a28fb682b72a709dcd.js": "/30-seconds-of-code-training/precache-manifest.6dacf4f700b107a28fb682b72a709dcd.js",
     "service-worker.js": "/30-seconds-of-code-training/service-worker.js",
     "static/css/2.ae12ecd5.chunk.css.map": "/30-seconds-of-code-training/static/css/2.ae12ecd5.chunk.css.map",
     "static/css/main.9c58eac3.chunk.css.map": "/30-seconds-of-code-training/static/css/main.9c58eac3.chunk.css.map",
-    "static/js/2.bf39a89a.chunk.js.LICENSE": "/30-seconds-of-code-training/static/js/2.bf39a89a.chunk.js.LICENSE",
+    "static/js/2.7bcedf69.chunk.js.LICENSE": "/30-seconds-of-code-training/static/js/2.7bcedf69.chunk.js.LICENSE",
     "static/media/semantic.min.css": "/30-seconds-of-code-training/static/media/outline-icons.ef60a4f6.woff"
   },
   "entrypoints": [
-    "static/js/runtime-main.b679efad.js",
+    "static/js/runtime-main.5651f455.js",
     "static/css/2.ae12ecd5.chunk.css",
-    "static/js/2.bf39a89a.chunk.js",
+    "static/js/2.7bcedf69.chunk.js",
     "static/css/main.9c58eac3.chunk.css",
-    "static/js/main.c82ed321.chunk.js"
+    "static/js/main.3d6e8a48.chunk.js"
   ]
 }
