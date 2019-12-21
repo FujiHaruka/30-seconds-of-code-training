@@ -4,10 +4,23 @@ Code training site using snippets in [30-seconds-of-code](https://github.com/30-
 
 ## Development
 
+Clone.
+
+```
+$ git clone https://github.com/FujiHaruka/30-seconds-of-code-training
+cd 30-seconds-of-code-training
+```
+
+Init and update git submodule.
+
+```
+$ git submodule update -i
+```
+
 Install.
 
 ```
-$ yarn
+$ yarn install
 ```
 
 Build.
